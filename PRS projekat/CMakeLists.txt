@@ -14,6 +14,6 @@ set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,--stack,500000000")
 #add_compile_options(/F 50000000)
 
 # Add source to this project's executable.
-add_executable (CMakeTarget "PRS projekat.cpp" )
+add_executable (CMakeTarget "main.cpp" )
 
 # TODO: Add tests and install targets if needed.
