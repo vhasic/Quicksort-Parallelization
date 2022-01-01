@@ -30,14 +30,10 @@ int standardPartition(int* array, int low, int high) {
     return i+1;
 }
 
+
 /// Generates Random Pivot, swaps pivot with end element and calls the partition function
 /// O(1.386 * n * log n)
 int partition_randomPivot(int* array, int low, int high) {
-/*    // generate thread safe random number
-    std::uniform_int_distribution<int> dice_distribution(low, high);
-    std::mt19937 random_number_engine; // pseudorandom number generator
-    auto dice_roller = std::bind(dice_distribution, random_number_engine);
-    int random_roll = dice_roller();  // Generate one of the integers [low,high]*/
     int random_roll = getRandomInt(low,high);
 
     std::swap(array[random_roll], array[high]);

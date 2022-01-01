@@ -1,5 +1,5 @@
 #include "partitions.cpp"
-
+#include <omp.h>
 
 void sequentialQuickSort(int* array, int first, int last) {
     if (first < last) {
@@ -43,33 +43,34 @@ void quickSortTasks(int* array, int first, int last, int sequentialLimit) {
             return sequentialQuickSort(array, first, last);
         }
         else {                                                       // inače paralelno
-//            int j = partition_medianOfThreePivot(array, first, last);
-            int j = standardPartition(array, first, last);
+            int j = partition_medianOfThreePivot(array, first, last);
+//            int j = standardPartition(array, first, last);
 
 #pragma omp task default(none) firstprivate(array, first, j, sequentialLimit)
             {
                 quickSortTasks(array, first, j - 1, sequentialLimit);
-                //                std::printf("Hello from thread %d of %d \n", omp_get_thread_num(), omp_get_num_threads());
+                //std::printf("Hello from thread %d of %d \n", omp_get_thread_num(), omp_get_num_threads());
             }
 #pragma omp task default(none) firstprivate(array, last, j, sequentialLimit)
             {
                 quickSortTasks(array, j + 1, last, sequentialLimit);
-                //                std::printf("Hello from thread %d of %d \n", omp_get_thread_num(), omp_get_num_threads());
+                //std::printf("Hello from thread %d of %d \n", omp_get_thread_num(), omp_get_num_threads());
             }
         }
     }
 }
 
 
-void quickSortSections(int* array, int first, int last, int sequentialLimit) {
+void quickSortSections(int* array, int first, int last, int sequentialLimit, int numThreads=4) {
     if (first < last) {                                               // sekvencijalno sortiranje
         if (last - first < sequentialLimit) {
             return sequentialQuickSort(array, first, last);
         }
         else {                                                       // inače paralelno
-            int j = standardPartition(array, first, last);
+            int j = partition_medianOfThreePivot(array, first, last);
+//            int j = standardPartition(array, first, last);
 
-#pragma omp parallel sections default(none) firstprivate(array, first, last, j, sequentialLimit) num_threads(4)
+#pragma omp parallel sections default(none) firstprivate(array, first, last, j, sequentialLimit) num_threads(numThreads)
             {
 #pragma omp section
                 {
@@ -78,6 +79,36 @@ void quickSortSections(int* array, int first, int last, int sequentialLimit) {
 #pragma omp section
                 {
                     quickSortTasks(array, j + 1, last, sequentialLimit);
+                }
+            }
+        }
+    }
+}
+
+//Izvršavaju samo 2 niti, i na mom dvojezgrenom procesoru ima najbolje rezultate
+void quickSortTasks_v2(int* array, int first, int last, int sequentialLimit) {
+    if (first < last) {                                               // sekvencijalno sortiranje
+        if (last - first < sequentialLimit) {
+            return sequentialQuickSort(array, first, last);
+        }
+        else {                                                       // inače paralelno
+            int j = partition_medianOfThreePivot(array, first, last);
+//            int j = standardPartition(array, first, last);
+
+#pragma omp parallel default(none) shared(array) firstprivate(first,last,sequentialLimit,j)
+            {
+#pragma omp single nowait
+                {
+#pragma omp task default(none) firstprivate(array, first, j, sequentialLimit)
+                    {
+                        quickSortTasks(array, first, j - 1, sequentialLimit);
+                        //std::printf("Hello from thread %d of %d \n", omp_get_thread_num(), omp_get_num_threads());
+                    }
+#pragma omp task default(none) firstprivate(array, last, j, sequentialLimit)
+                    {
+                        quickSortTasks(array, j + 1, last, sequentialLimit);
+                        //std::printf("Hello from thread %d of %d \n", omp_get_thread_num(), omp_get_num_threads());
+                    }
                 }
             }
         }
