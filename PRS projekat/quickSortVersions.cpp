@@ -155,9 +155,8 @@ void FORCE_INLINE swap_epi32(
 
 #define _mm256_iszero(vec) (_mm256_testz_si256(vec, vec) != 0)
 
-void FORCE_INLINE partition_epi32(uint32_t* array, int& left, int& right) {
+void FORCE_INLINE partition_epi32(uint32_t* array, const uint32_t pv, int& left, int& right) {
 
-    uint32_t pv = partition_medianOfThreePivot32(array, left, right);
     const int N = 8; // the number of items in a register (256/32)
 
     __m256i L;
@@ -192,11 +191,8 @@ void FORCE_INLINE partition_epi32(uint32_t* array, int& left, int& right) {
         }
 
         if (maskR == 0) {
-            std::cout<<"MASKR"<<",";
             while (true) {
-                std::cout<<"WHILE"<<",";
                 if ((right - N) - left + 1 < 2*N) {
-                    std::cout<<"END"<<",";
                     goto end;
                 }
 
@@ -269,6 +265,30 @@ void FORCE_INLINE partition_epi32(uint32_t* array, int& left, int& right) {
             scalar_partition_epi32(array, pv, left, right);
         }
     }
+}
+
+void quicksort_32(uint32_t* array, int left, int right) {
+
+    int i = left;
+    int j = right;
+
+    const uint32_t pivot = array[(i + j)/2];
+    const int AVX2_REGISTER_SIZE = 8; // in 32-bit words
+
+    if (j - i >= 2 * AVX2_REGISTER_SIZE) {
+        partition_epi32(array, pivot, i, j);
+    } else {
+        scalar_partition_epi32(array, pivot, i, j);
+    }
+
+    if (left < j) {
+        quicksort_32(array, left, j);
+    }
+
+    if (i < right) {
+        quicksort_32(array, i, right);
+    }
+
 }
 
 

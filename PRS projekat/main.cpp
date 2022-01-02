@@ -104,67 +104,67 @@ int main() {
 //    array= initializeArrayAverageCase(),n);
 
     //sekvencijalna verzija sa standardnom particijom
-    array= initializeArrayWorstCase(array,n);
-    timeBefore = std::clock();
-    sequentialQuickSort(array, 0, n - 1);
-    timeAfter = std::clock();
-    executionTime = (timeAfter - timeBefore) / (CLOCKS_PER_SEC / 1000);
-    std::printf("Vrijeme izvrsenja: %d ms\n", executionTime);
-    if (isSorted(array, n)) {
-        std::printf("OK\n");
-        writeResultInFile(1, executionTime,n,"Sekvencijalno-standardnaParticija");
-    }
-    else {
-        std::printf("Nije OK\n");
-    }
+//    array= initializeArrayWorstCase(array,n);
+//    timeBefore = std::clock();
+//    sequentialQuickSort(array, 0, n - 1);
+//    timeAfter = std::clock();
+//    executionTime = (timeAfter - timeBefore) / (CLOCKS_PER_SEC / 1000);
+//    std::printf("Vrijeme izvrsenja: %d ms\n", executionTime);
+//    if (isSorted(array, n)) {
+//        std::printf("OK\n");
+//        writeResultInFile(1, executionTime,n,"Sekvencijalno-standardnaParticija");
+//    }
+//    else {
+//        std::printf("Nije OK\n");
+//    }
 
     //sekvencijalna verzija sa random pivotom u particiji
-    array= initializeArrayWorstCase(array,n);
-    timeBefore = std::clock();
-    sequentialQuickSortRandomPivot(array, 0, n - 1);
-    timeAfter = std::clock();
-    executionTime = (timeAfter - timeBefore) / (CLOCKS_PER_SEC / 1000);
-    std::printf("Vrijeme izvrsenja: %d ms\n", executionTime);
-    // provjera da li je niz dobro sortiran
-    if (isSorted(array, n)) {
-        std::printf("OK\n");
-        writeResultInFile(1, executionTime,n,"Sekvencijalno-randomPivot");
-    }
-    else {
-        std::printf("Nije OK\n");
-    }
+//    array= initializeArrayWorstCase(array,n);
+//    timeBefore = std::clock();
+//    sequentialQuickSortRandomPivot(array, 0, n - 1);
+//    timeAfter = std::clock();
+//    executionTime = (timeAfter - timeBefore) / (CLOCKS_PER_SEC / 1000);
+//    std::printf("Vrijeme izvrsenja: %d ms\n", executionTime);
+//    // provjera da li je niz dobro sortiran
+//    if (isSorted(array, n)) {
+//        std::printf("OK\n");
+//        writeResultInFile(1, executionTime,n,"Sekvencijalno-randomPivot");
+//    }
+//    else {
+//        std::printf("Nije OK\n");
+//    }
 
     //sekvencijalna verzija sa median of three pivotom u particiji
-    array= initializeArrayWorstCase(array,n);
-    timeBefore = std::clock();
-    sequentialQuickSortMedianOfThreePivot(array, 0, n - 1);
-    timeAfter = std::clock();
-    executionTime = (timeAfter - timeBefore) / (CLOCKS_PER_SEC / 1000);
-    std::printf("Vrijeme izvrsenja: %d ms\n", executionTime);
-    // provjera da li je niz dobro sortiran
-    if (isSorted(array, n)) {
-        std::printf("OK\n");
-        writeResultInFile(1, executionTime,n,"Sekvencijalno-medianOfThreePivot");
-    }
-    else {
-        std::printf("Nije OK\n");
-    }
+//    array= initializeArrayWorstCase(array,n);
+//    timeBefore = std::clock();
+//    sequentialQuickSortMedianOfThreePivot(array, 0, n - 1);
+//    timeAfter = std::clock();
+//    executionTime = (timeAfter - timeBefore) / (CLOCKS_PER_SEC / 1000);
+//    std::printf("Vrijeme izvrsenja: %d ms\n", executionTime);
+//    // provjera da li je niz dobro sortiran
+//    if (isSorted(array, n)) {
+//        std::printf("OK\n");
+//        writeResultInFile(1, executionTime,n,"Sekvencijalno-medianOfThreePivot");
+//    }
+//    else {
+//        std::printf("Nije OK\n");
+//    }
 
 
-     //paralelizacija sa sekcijama
-    array= initializeArrayWorstCase(array,n);
-    timeBefore = std::clock();
-    quickSortSections(array, 0, n - 1,sequentialLimit);
-    timeAfter = std::clock();
-    executionTime = (timeAfter - timeBefore) / (CLOCKS_PER_SEC / 1000);
-    std::printf("Vrijeme izvrsenja: %d ms\n", executionTime);
-    writeResultInFile(4, executionTime,n,"Paralelno-Sekcije-medianOfThreePivot");
-    if (isSorted(array, n)) {
-        std::printf("OK\n");
-    }
-    else {
-        std::printf("Nije OK\n");
-    }
+    // paralelizacija sa sekcijama
+//    array= initializeArrayWorstCase(array,n);
+//    timeBefore = std::clock();
+//    quickSortSections(array, 0, n - 1,sequentialLimit);
+//    timeAfter = std::clock();
+//    executionTime = (timeAfter - timeBefore) / (CLOCKS_PER_SEC / 1000);
+//    std::printf("Vrijeme izvrsenja: %d ms\n", executionTime);
+//    writeResultInFile(4, executionTime,n,"Paralelno-Sekcije-medianOfThreePivot");
+//    if (isSorted(array, n)) {
+//        std::printf("OK\n");
+//    }
+//    else {
+//        std::printf("Nije OK\n");
+//    }
 
 
     // paralelizacija sa taskovima
@@ -214,7 +214,7 @@ int main() {
 
 
         //        new shit 2
-        int n2= 25;
+        int n2= 75;
         uint32_t *array2 = new uint32_t[n2];
         array2= initializeArrayWorstCase32(array2, n2);
         int i = 0;
@@ -224,7 +224,7 @@ int main() {
         const uint32_t pivot = array2[(i + j)/2];
 
         timeBefore = std::clock();
-        partition_epi32(array2,i, j);
+        quicksort_32(array2,i, j);
         timeAfter = std::clock();
 
         executionTime = (timeAfter - timeBefore) / (CLOCKS_PER_SEC / 1000);
@@ -234,10 +234,11 @@ int main() {
         // provjera da li je niz dobro sortiran, tj. da li je paralelizacija korektna
         if (isSorted32(array2, n2)) {
             std::printf("OK\n");
+            showArray32(array2, 0, n2-1);
         }
         else {
             std::printf("Nije OK\n");
-            showArray32(array2, 0, n2-1);
+
         }
         delete[] array2;
 
