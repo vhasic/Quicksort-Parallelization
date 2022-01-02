@@ -13,7 +13,13 @@ set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,--stack,500000000")
 #SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -foo" )
 #add_compile_options(/F 50000000)
 
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mavx")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -msse4.1")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mavx2")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-stack-protector")
+
 # Add source to this project's executable.
-add_executable (CMakeTarget "main.cpp" )
+add_executable (CMakeTarget "main.cpp")
 
 # TODO: Add tests and install targets if needed.

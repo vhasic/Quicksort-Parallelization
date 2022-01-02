@@ -30,6 +30,23 @@ int standardPartition(int* array, int low, int high) {
     return i+1;
 }
 
+int standardPartition32(uint32_t * array, int low, int high) {
+    int pivot = array[high];
+    // Index of smaller element
+    int i = low - 1;
+
+    for(int j = low; j <= high-1; j++){
+        // If current element is smaller than or equal to pivot
+        if(array[j] <= pivot){
+            // increment index of smaller element
+            i++;
+            std::swap(array[i], array[j]);
+        }
+    }
+    std::swap(array[i+1], array[high]);
+    return i+1;
+}
+
 
 /// Generates Random Pivot, swaps pivot with end element and calls the partition function
 /// O(1.386 * n * log n)
@@ -54,4 +71,18 @@ int partition_medianOfThreePivot(int* array, int low, int high) {
         std::swap(array[mid], array[high]);
     }
     return standardPartition(array, low, high);
+}
+
+int partition_medianOfThreePivot32(uint32_t * array, int low, int high) {
+    int mid = (low + high) / 2;
+    if (array[mid] < array[low]) {
+        std::swap(array[low], array[mid]);
+    }
+    if (array[high] < array[low]) {
+        std::swap(array[low], array[high]);
+    }
+    if (array[mid] < array[high]) {
+        std::swap(array[mid], array[high]);
+    }
+    return standardPartition32(array, low, high);
 }
