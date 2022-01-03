@@ -8,16 +8,16 @@
 
 #define FORCE_INLINE inline __attribute__((always_inline))
 
-template<class T> inline void Log(const __m256i & value)
-{
+template<class T>
+inline void Log(const __m256i &value) {
     const size_t n = sizeof(__m256i) / sizeof(T);
     T buffer[n];
-    _mm256_storeu_si256((__m256i*)buffer, value);
+    _mm256_storeu_si256((__m256i *) buffer, value);
     for (int i = 0; i < n; i++)
         std::cout << buffer[i] << " ";
 }
 
-void sequentialQuickSort(int* array, int first, int last) {
+void sequentialQuickSort(int *array, int first, int last) {
     if (first < last) {
         int j = standardPartition(array, first, last);
         sequentialQuickSort(array, first, j - 1);
@@ -25,7 +25,7 @@ void sequentialQuickSort(int* array, int first, int last) {
     }
 }
 
-void sequentialQuickSortRandomPivot(int* array, int first, int last) {
+void sequentialQuickSortRandomPivot(int *array, int first, int last) {
     if (first < last) {
         int j = partition_randomPivot(array, first, last);
         sequentialQuickSort(array, first, j - 1);
@@ -33,15 +33,13 @@ void sequentialQuickSortRandomPivot(int* array, int first, int last) {
     }
 }
 
-void sequentialQuickSortMedianOfThreePivot(int* array, int first, int last) {
+void sequentialQuickSortMedianOfThreePivot(int *array, int first, int last) {
     if (first < last) {
         int j = partition_medianOfThreePivot(array, first, last);
         sequentialQuickSort(array, first, j - 1);
         sequentialQuickSort(array, j + 1, last);
     }
 }
-
-//TODO: Uraditi particiju sa SIMD implementacijom
 
 /**
  * Funkcija vrši paralelno sortiranje niza uz pomoć QuickSort algoritma
@@ -57,12 +55,12 @@ void sequentialQuickSortMedianOfThreePivot(int* array, int first, int last) {
 //**********************************************************************************************************************
 //32 bitni integer brojevi
 
-void quicksort_32(uint32_t* array, int left, int right, int sequentialLimit) {
+void quicksort_32(uint32_t *array, int left, int right, int sequentialLimit) {
 
     int i = left;
     int j = right;
 
-    const uint32_t pivot = array[(i + j)/2];
+    const uint32_t pivot = array[(i + j) / 2];
     const int AVX2_REGISTER_SIZE = 8; // in 32-bit words
 
     if (j - i >= sequentialLimit) {
@@ -84,12 +82,11 @@ void quicksort_32(uint32_t* array, int left, int right, int sequentialLimit) {
 
 //*******************************************************************************************************************
 
-void quickSortTasks(int* array, int first, int last, int sequentialLimit) {
+void quickSortTasks(int *array, int first, int last, int sequentialLimit) {
     if (first < last) {                                               // sekvencijalno sortiranje
         if (last - first < sequentialLimit) {
             return sequentialQuickSort(array, first, last);
-        }
-        else {                                                       // inače paralelno
+        } else {                                                       // inače paralelno
             int j = partition_medianOfThreePivot(array, first, last);
 //            int j = standardPartition(array, first, last);
 
@@ -108,12 +105,11 @@ void quickSortTasks(int* array, int first, int last, int sequentialLimit) {
 }
 
 
-void quickSortSections(int* array, int first, int last, int sequentialLimit, int numThreads=4) {
+void quickSortSections(int *array, int first, int last, int sequentialLimit, int numThreads = 4) {
     if (first < last) {                                               // sekvencijalno sortiranje
         if (last - first < sequentialLimit) {
             return sequentialQuickSort(array, first, last);
-        }
-        else {                                                       // inače paralelno
+        } else {                                                       // inače paralelno
             int j = partition_medianOfThreePivot(array, first, last);
 //            int j = standardPartition(array, first, last);
 
@@ -133,16 +129,15 @@ void quickSortSections(int* array, int first, int last, int sequentialLimit, int
 }
 
 //Izvršavaju samo 2 niti, i na mom dvojezgrenom procesoru ima najbolje rezultate
-void quickSortTasks_v2(int* array, int first, int last, int sequentialLimit) {
+void quickSortTasks_v2(int *array, int first, int last, int sequentialLimit) {
     if (first < last) {                                               // sekvencijalno sortiranje
         if (last - first < sequentialLimit) {
             return sequentialQuickSort(array, first, last);
-        }
-        else {                                                       // inače paralelno
+        } else {                                                       // inače paralelno
             int j = partition_medianOfThreePivot(array, first, last);
 //            int j = standardPartition(array, first, last);
 
-#pragma omp parallel default(none) shared(array) firstprivate(first,last,sequentialLimit,j)
+#pragma omp parallel default(none) shared(array) firstprivate(first, last, sequentialLimit, j)
             {
 #pragma omp single nowait
                 {
