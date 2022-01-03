@@ -28,29 +28,21 @@ void sequentialQuickSort(int *array, int first, int last) {
 void sequentialQuickSortRandomPivot(int *array, int first, int last) {
     if (first < last) {
         int j = partition_randomPivot(array, first, last);
-        sequentialQuickSort(array, first, j - 1);
-        sequentialQuickSort(array, j + 1, last);
+        sequentialQuickSortRandomPivot(array, first, j - 1);
+        sequentialQuickSortRandomPivot(array, j + 1, last);
     }
 }
 
-void sequentialQuickSortMedianOfThreePivot(int *array, int first, int last) {
+template<typename Tip>
+void sequentialQuickSortMedianOfThreePivot(Tip *array, int first, int last) {
     if (first < last) {
         int j = partition_medianOfThreePivot(array, first, last);
-        sequentialQuickSort(array, first, j - 1);
-        sequentialQuickSort(array, j + 1, last);
+        sequentialQuickSortMedianOfThreePivot(array, first, j - 1);
+        sequentialQuickSortMedianOfThreePivot(array, j + 1, last);
     }
 }
 
-/**
- * Funkcija vrši paralelno sortiranje niza uz pomoć QuickSort algoritma
- * Ukoliko je niz premali (< granice) da se izvršava paralelno, jer bi se gubilo previše vremena na paralelnom overhead-u,
- * onda  se takav niz sortira sekvencijalno
- *
- * @param array Pokazivač na niz koji se sortira
- * @param first Donja granica niza koji se sortira
- * @param last Gornja granica niza koji se sortira
- * @param sequentialLimit Granica za sekvencijalno izvršavanje
- */
+
 
 //**********************************************************************************************************************
 //32 bitni integer brojevi
@@ -82,6 +74,16 @@ void quicksort_32(uint32_t *array, int left, int right, int sequentialLimit) {
 
 //*******************************************************************************************************************
 
+/**
+ * Funkcija vrši paralelno sortiranje niza uz pomoć QuickSort algoritma
+ * Ukoliko je niz premali (< granice) da se izvršava paralelno, jer bi se gubilo previše vremena na paralelnom overhead-u,
+ * onda  se takav niz sortira sekvencijalno
+ *
+ * @param array Pokazivač na niz koji se sortira
+ * @param first Donja granica niza koji se sortira
+ * @param last Gornja granica niza koji se sortira
+ * @param sequentialLimit Granica za sekvencijalno izvršavanje
+ */
 void quickSortTasks(int *array, int first, int last, int sequentialLimit) {
     if (first < last) {                                               // sekvencijalno sortiranje
         if (last - first < sequentialLimit) {
@@ -104,6 +106,47 @@ void quickSortTasks(int *array, int first, int last, int sequentialLimit) {
     }
 }
 
+void quickSortTasksAVX(uint32_t *array, int left, int right, int sequentialLimit) {
+    // Median of three pivot
+    int mid = (left + right) / 2;
+    if (array[mid] < array[left]) {
+        std::swap(array[left], array[mid]);
+    }
+    if (array[right] < array[left]) {
+        std::swap(array[left], array[right]);
+    }
+    if (array[mid] < array[right]) {
+        std::swap(array[mid], array[right]);
+    }
+    uint32_t pivot = array[right];
+
+    int i = left;
+    int j = right;
+
+    // AVX particija
+    if (j - i >= sequentialLimit) {
+        partition_epi32(array, pivot, i, j);
+    } else {
+        scalar_partition_epi32(array, pivot, i, j);
+    }
+
+    // paralelizacija sa taskovima
+    if (left < j) {
+#pragma omp task default(none) firstprivate(array, left, j, sequentialLimit)
+        {
+            quicksort_32(array, left, j, sequentialLimit);
+            //std::printf("Hello from thread %d of %d \n", omp_get_thread_num(), omp_get_num_threads());
+        }
+    }
+
+    if (i < right) {
+#pragma omp task default(none) firstprivate(array, right, i, sequentialLimit)
+        {
+            quicksort_32(array, i, right, sequentialLimit);
+            //std::printf("Hello from thread %d of %d \n", omp_get_thread_num(), omp_get_num_threads());
+        }
+    }
+}
 
 void quickSortSections(int *array, int first, int last, int sequentialLimit, int numThreads = 4) {
     if (first < last) {                                               // sekvencijalno sortiranje

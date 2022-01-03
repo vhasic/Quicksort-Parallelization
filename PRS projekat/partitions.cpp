@@ -32,8 +32,9 @@ int getRandomInt(const int &min = 1, const int &max = 1000) {
 }*/
 
 ///Lomuto's partition Scheme
-int standardPartition(int *array, int low, int high) {
-    int pivot = array[high];
+template<typename Tip>
+int standardPartition(Tip *array, int low, int high) {
+    Tip pivot = array[high];
     // Index of smaller element
     int i = low - 1;
 
@@ -60,7 +61,8 @@ int partition_randomPivot(int *array, int low, int high) {
 
 /// Optimizirana particija, tako da se za pivot uzima Median-of-three O(1.188*n*log n)
 ///Median-of-three: https://en.wikipedia.org/wiki/Quicksort#:~:text=Median%2Dof%2Dthree%20code%20snippet%20for%20Lomuto%20partition%3A
-int partition_medianOfThreePivot(int *array, int low, int high) {
+template<typename Tip>
+int partition_medianOfThreePivot(Tip *array, int low, int high) {
     int mid = (low + high) / 2;
     if (array[mid] < array[low]) {
         std::swap(array[low], array[mid]);
