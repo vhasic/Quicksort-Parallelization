@@ -53,7 +53,6 @@ void quicksort_32(uint32_t *array, int left, int right, int sequentialLimit) {
     int j = right;
 
     const uint32_t pivot = array[(i + j) / 2];
-    const int AVX2_REGISTER_SIZE = 8; // in 32-bit words
 
     if (j - i >= sequentialLimit) {
         partition_epi32(array, pivot, i, j);
