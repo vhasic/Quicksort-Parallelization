@@ -52,7 +52,7 @@ void executeVersionQuickSort(Tip* array, int n, int sequentialLimit, int numThre
             }
         }
     }
-    else if (versionString=="Paralelno-Taskovi-medianOfThreePivot-AVX-averageCase: " || versionString=="Paralelno-Taskovi-medianOfThreePivot-AVX-worstCase: "){
+    else if (versionString=="Paralelno-Taskovi-AVX-averageCase: " || versionString=="Paralelno-Taskovi-AVX-worstCase: "){
 #pragma omp parallel default(none) firstprivate(sequentialLimit) shared(array, n) num_threads(numThreads)
         {
 #pragma omp single nowait

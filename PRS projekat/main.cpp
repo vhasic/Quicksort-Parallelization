@@ -3,8 +3,8 @@
 
 int main() {
 
-    std::vector<int> arrayNumberOfElements({100'000, 500'000, 1'000'000, 5'000'000, 10'000'000, 50'000'000, 100'000'000});
-//    std::vector<int> arrayNumberOfElements({100'000});
+//    std::vector<int> arrayNumberOfElements({100'000, 500'000, 1'000'000, 5'000'000, 10'000'000, 50'000'000, 100'000'000});
+    std::vector<int> arrayNumberOfElements({100'000});
     for (int n: arrayNumberOfElements) {
         int *initializedArray = new int[n];
         initializedArray = initializeArrayAverageCase(initializedArray, n);
@@ -39,8 +39,8 @@ int main() {
             executeVersionQuickSort(array2,n,sequentialLimit,numThreads,"Paralelno-Taskovi-medianOfThreePivot-worstCase: ",true,initializedArray);
             executeVersionQuickSort(array2,n,sequentialLimit,numThreads,"Paralelno-Taskovi-medianOfThreePivot-averageCase: ",false,initializedArray);
 
-            executeVersionQuickSort(array2,n,sequentialLimit,numThreads,"Paralelno-Taskovi-medianOfThreePivot-AVX-worstCase: ",true,initializedArray);
-            executeVersionQuickSort(array2,n,sequentialLimit,numThreads,"Paralelno-Taskovi-medianOfThreePivot-AVX-averageCase: ",false,initializedArray);
+            executeVersionQuickSort(array2,n,sequentialLimit,numThreads,"Paralelno-Taskovi-AVX-worstCase: ",true,initializedArray);
+            executeVersionQuickSort(array2,n,sequentialLimit,numThreads,"Paralelno-Taskovi-AVX-averageCase: ",false,initializedArray);
 
 
             executeVersionQuickSort(array2,n,sequentialLimit,numThreads,"Paralelno-Sekcije-medianOfThreePivot-worstCase: ",true,initializedArray);
