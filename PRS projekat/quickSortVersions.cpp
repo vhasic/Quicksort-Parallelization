@@ -17,7 +17,8 @@ inline void Log(const __m256i &value) {
         std::cout << buffer[i] << " ";
 }
 
-void sequentialQuickSort(int *array, int first, int last) {
+template<typename Tip>
+void sequentialQuickSort(Tip *array, int first, int last) {
     if (first < last) {
         int j = standardPartition(array, first, last);
         sequentialQuickSort(array, first, j - 1);
@@ -25,7 +26,8 @@ void sequentialQuickSort(int *array, int first, int last) {
     }
 }
 
-void sequentialQuickSortRandomPivot(int *array, int first, int last) {
+template<typename Tip>
+void sequentialQuickSortRandomPivot(Tip *array, int first, int last) {
     if (first < last) {
         int j = partition_randomPivot(array, first, last);
         sequentialQuickSortRandomPivot(array, first, j - 1);
@@ -84,10 +86,11 @@ void quicksort_32(uint32_t *array, int left, int right, int sequentialLimit) {
  * @param last Gornja granica niza koji se sortira
  * @param sequentialLimit Granica za sekvencijalno izvršavanje
  */
-void quickSortTasks(int *array, int first, int last, int sequentialLimit) {
+template<typename Tip>
+void quickSortTasks(Tip *array, int first, int last, int sequentialLimit) {
     if (first < last) {                                               // sekvencijalno sortiranje
         if (last - first < sequentialLimit) {
-            return sequentialQuickSort(array, first, last);
+            return sequentialQuickSortMedianOfThreePivot(array, first, last);
         } else {                                                       // inače paralelno
             int j = partition_medianOfThreePivot(array, first, last);
 //            int j = standardPartition(array, first, last);
@@ -106,7 +109,7 @@ void quickSortTasks(int *array, int first, int last, int sequentialLimit) {
     }
 }
 
-void quickSortTasksAVX(uint32_t *array, int left, int right, int sequentialLimit) {
+/*void quickSortTasksAVX(uint32_t *array, int left, int right, int sequentialLimit) {
     // Median of three pivot
     int mid = (left + right) / 2;
     if (array[mid] < array[left]) {
@@ -146,54 +149,68 @@ void quickSortTasksAVX(uint32_t *array, int left, int right, int sequentialLimit
             //std::printf("Hello from thread %d of %d \n", omp_get_thread_num(), omp_get_num_threads());
         }
     }
+}*/
+
+void quickSortTasksAVX(uint32_t *array, int left, int right, int sequentialLimit) {
+/*    // Median of three pivot
+    int mid = (left + right) / 2;
+    if (array[mid] < array[left]) {
+        std::swap(array[left], array[mid]);
+    }
+    if (array[right] < array[left]) {
+        std::swap(array[left], array[right]);
+    }
+    if (array[mid] < array[right]) {
+        std::swap(array[mid], array[right]);
+    }
+    uint32_t pivot = array[right];*/
+
+    int i = left;
+    int j = right;
+    const uint32_t pivot = array[(i + j) / 2];
+
+    // AVX particija
+    if (j - i >= sequentialLimit) {
+        partition_epi32(array, pivot, i, j);
+    } else {
+        scalar_partition_epi32(array, pivot, i, j);
+    }
+
+    // paralelizacija sa taskovima
+    if (left < j) {
+#pragma omp task default(none) firstprivate(array, left, j, sequentialLimit)
+        {
+            quickSortTasksAVX(array, left, j, sequentialLimit);
+            //std::printf("Hello from thread %d of %d \n", omp_get_thread_num(), omp_get_num_threads());
+        }
+    }
+
+    if (i < right) {
+#pragma omp task default(none) firstprivate(array, right, i, sequentialLimit)
+        {
+            quickSortTasksAVX(array, i, right, sequentialLimit);
+            //std::printf("Hello from thread %d of %d \n", omp_get_thread_num(), omp_get_num_threads());
+        }
+    }
 }
 
-void quickSortSections(int *array, int first, int last, int sequentialLimit, int numThreads = 4) {
+template<typename Tip>
+void quickSortSections(Tip *array, int first, int last, int sequentialLimit, int numThreads = 4) {
     if (first < last) {                                               // sekvencijalno sortiranje
         if (last - first < sequentialLimit) {
-            return sequentialQuickSort(array, first, last);
+            return sequentialQuickSortMedianOfThreePivot(array, first, last);
         } else {                                                       // inače paralelno
             int j = partition_medianOfThreePivot(array, first, last);
-//            int j = standardPartition(array, first, last);
 
 #pragma omp parallel sections default(none) firstprivate(array, first, last, j, sequentialLimit) num_threads(numThreads)
             {
 #pragma omp section
                 {
-                    quickSortTasks(array, first, j - 1, sequentialLimit);
+                    quickSortSections(array, first, j - 1, sequentialLimit);
                 }
 #pragma omp section
                 {
-                    quickSortTasks(array, j + 1, last, sequentialLimit);
-                }
-            }
-        }
-    }
-}
-
-//Izvršavaju samo 2 niti, i na mom dvojezgrenom procesoru ima najbolje rezultate
-void quickSortTasks_v2(int *array, int first, int last, int sequentialLimit) {
-    if (first < last) {                                               // sekvencijalno sortiranje
-        if (last - first < sequentialLimit) {
-            return sequentialQuickSort(array, first, last);
-        } else {                                                       // inače paralelno
-            int j = partition_medianOfThreePivot(array, first, last);
-//            int j = standardPartition(array, first, last);
-
-#pragma omp parallel default(none) shared(array) firstprivate(first, last, sequentialLimit, j)
-            {
-#pragma omp single nowait
-                {
-#pragma omp task default(none) firstprivate(array, first, j, sequentialLimit)
-                    {
-                        quickSortTasks(array, first, j - 1, sequentialLimit);
-                        //std::printf("Hello from thread %d of %d \n", omp_get_thread_num(), omp_get_num_threads());
-                    }
-#pragma omp task default(none) firstprivate(array, last, j, sequentialLimit)
-                    {
-                        quickSortTasks(array, j + 1, last, sequentialLimit);
-                        //std::printf("Hello from thread %d of %d \n", omp_get_thread_num(), omp_get_num_threads());
-                    }
+                    quickSortSections(array, j + 1, last, sequentialLimit);
                 }
             }
         }

@@ -52,7 +52,8 @@ int standardPartition(Tip *array, int low, int high) {
 
 /// Generates Random Pivot, swaps pivot with end element and calls the partition function
 /// O(1.386 * n * log n)
-int partition_randomPivot(int *array, int low, int high) {
+template<typename Tip>
+int partition_randomPivot(Tip *array, int low, int high) {
     int random_roll = getRandomInt(low, high);
 
     std::swap(array[random_roll], array[high]);
