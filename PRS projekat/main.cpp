@@ -3,8 +3,9 @@
 
 int main() {
 
-//    std::vector<int> arrayNumberOfElements({100'000, 500'000, 1'000'000, 5'000'000, 10'000'000, 50'000'000, 100'000'000});
-    std::vector<int> arrayNumberOfElements({100'000});
+    std::vector<int> arrayNumberOfElements({100'000, 500'000, 1'000'000, 5'000'000, 10'000'000, 50'000'000, 100'000'000});
+//    std::vector<int> arrayNumberOfElements({100'000});
+    int br=0;
     for (int n: arrayNumberOfElements) {
         int *initializedArray = new int[n];
         initializedArray = initializeArrayAverageCase(initializedArray, n);
@@ -13,11 +14,19 @@ int main() {
         int *array = new int[n];
         uint32_t *array2 = new uint32_t[n];
 
-        executeVersionQuickSort(array2,n,n,1,"Sekvencijalno-standardnaParticija-worstCase: ",true,initializedArray);
-        executeVersionQuickSort(array2,n,n,1,"Sekvencijalno-standardnaParticija-averageCase: ",false,initializedArray);
+        // Neka se ove sekvencijalne verzije samo jednom izvrše da se uporedi da je ona Median of three najbolja
+        // i nju dalje koristiti kako nebismo čekali satima da se izvrši
+        if(br==0){
+            executeVersionQuickSort(array2,n,n,1,"Sekvencijalno-standardnaParticija-worstCase: ",true,initializedArray);
+            executeVersionQuickSort(array2,n,n,1,"Sekvencijalno-standardnaParticija-averageCase: ",false,initializedArray);
 
-        executeVersionQuickSort(array2,n,n,1,"Sekvencijalno-randomPivot-worstCase: ",true,initializedArray);
-        executeVersionQuickSort(array2,n,n,1,"Sekvencijalno-randomPivot-averageCase: ",false,initializedArray);
+            executeVersionQuickSort(array2,n,n,1,"Sekvencijalno-randomPivot-worstCase: ",true,initializedArray);
+            executeVersionQuickSort(array2,n,n,1,"Sekvencijalno-randomPivot-averageCase: ",false,initializedArray);
+
+            executeVersionQuickSort(array2,n,n,1,"Sekvencijalno-medianOfThreePivot-worstCase: ",true,initializedArray);
+            executeVersionQuickSort(array2,n,n,1,"Sekvencijalno-medianOfThreePivot-averageCase: ",false,initializedArray);
+        }
+        br++;
 
         executeVersionQuickSort(array2,n,n,1,"Sekvencijalno-medianOfThreePivot-worstCase: ",true,initializedArray);
         executeVersionQuickSort(array2,n,n,1,"Sekvencijalno-medianOfThreePivot-averageCase: ",false,initializedArray);
