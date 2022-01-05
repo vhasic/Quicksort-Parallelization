@@ -52,7 +52,7 @@ void executeVersionQuickSort(Tip* array, int n, int sequentialLimit, int numThre
             }
         }
     }
-    else if (versionString=="Paralelno-Taskovi-AVX-averageCase: " || versionString=="Paralelno-Taskovi-AVX-worstCase: "){
+    else if (versionString=="Paralelno-Taskovi-medianOfThreePivot-AVX-averageCase: " || versionString=="Paralelno-Taskovi-medianOfThreePivot-AVX-worstCase: "){
 #pragma omp parallel default(none) firstprivate(sequentialLimit) shared(array, n) num_threads(numThreads)
         {
 #pragma omp single nowait
@@ -67,7 +67,7 @@ void executeVersionQuickSort(Tip* array, int n, int sequentialLimit, int numThre
 
     timeAfter = std::clock();
     executionTime = (timeAfter - timeBefore) / (CLOCKS_PER_SEC / 1000);
-    std::cout<<"Vrijeme izvrsenja za "<< versionString<< executionTime<<std::endl;
+    std::cout<<"Vrijeme izvrsenja za n= "<<n<<" i "<< versionString<< executionTime<<std::endl;
     // provjera da li je niz dobro sortiran, tj. da li je paralelizacija korektna
     if (isSorted(array, n)) {
         std::printf("OK\n");

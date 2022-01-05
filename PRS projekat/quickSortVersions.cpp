@@ -151,22 +151,24 @@ void quickSortTasks(Tip *array, int first, int last, int sequentialLimit) {
 }*/
 
 void quickSortTasksAVX(uint32_t *array, int left, int right, int sequentialLimit) {
-/*    // Median of three pivot
+    // ovo je bolje za average case ali lošije za worst case
+    // Median of three pivot
     int mid = (left + right) / 2;
-    if (array[mid] < array[left]) {
-        std::swap(array[left], array[mid]);
-    }
     if (array[right] < array[left]) {
         std::swap(array[left], array[right]);
     }
-    if (array[mid] < array[right]) {
+    if (array[mid] < array[left]) {
+        std::swap(array[left], array[mid]);
+    }
+    if (array[right] < array[mid]) {
         std::swap(array[mid], array[right]);
     }
-    uint32_t pivot = array[right];*/
+    uint32_t pivot = array[mid];
 
     int i = left;
     int j = right;
-    const uint32_t pivot = array[(i + j) / 2];
+//    ovo je bolje za worst case ali je lošije za average case
+//    const uint32_t pivot = array[(i + j) / 2];
 
     // AVX particija
     if (j - i >= sequentialLimit) {
